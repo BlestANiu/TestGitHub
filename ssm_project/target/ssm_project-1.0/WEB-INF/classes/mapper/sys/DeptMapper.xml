@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.wanho.mapper.sys.DeptMapper">
+    <resultMap id="DeptResult" type="Dept" >
+        <id column="dept_id" property="deptId"/><!-- 部门id -->
+        <result column="parent_id" property="parentId"/><!-- 父部门id -->
+        <result column="ancestors" property="ancestors"/><!-- 祖级列表 -->
+        <result column="dept_name" property="deptName"/><!-- 部门名称 -->
+        <result column="order_num" property="orderNum"/><!-- 显示顺序 -->
+        <result column="leader" property="leader"/><!-- 负责人 -->
+        <result column="phone" property="phone"/><!-- 联系电话 -->
+        <result column="email" property="email"/><!-- 邮箱 -->
+        <result column="status" property="status"/><!-- 部门状态（0正常 1停用） -->
+        <result column="del_flag" property="delFlag"/><!-- 删除标志（0代表存在 2代表删除） -->
+        <result column="create_by" property="createBy"/><!-- 创建者 -->
+        <result column="create_time" property="createTime"/><!-- 创建时间 -->
+        <result column="update_by" property="updateBy"/><!-- 更新者 -->
+        <result column="update_time" property="updateTime"/><!-- 更新时间 -->
+    </resultMap>
+
+    <resultMap id="DeptExtResult" type="net.wanho.po.sys.Ext.DeptExt" >
+        <id column="dept_id" property="deptId"/><!-- 部门id -->
+        <result column="parent_id" property="parentId"/><!-- 父部门id -->
+        <result column="ancestors" property="ancestors"/><!-- 祖级列表 -->
+        <result column="dept_name" property="deptName"/><!-- 部门名称 -->
+        <result column="order_num" property="orderNum"/><!-- 显示顺序 -->
+        <result column="leader" property="leader"/><!-- 负责人 -->
+        <result column="phone" property="phone"/><!-- 联系电话 -->
+        <result column="email" property="email"/><!-- 邮箱 -->
+        <result column="status" property="status"/><!-- 部门状态（0正常 1停用） -->
+        <result column="del_flag" property="delFlag"/><!-- 删除标志（0代表存在 2代表删除） -->
+        <result column="create_by" property="createBy"/><!-- 创建者 -->
+        <result column="create_time" property="createTime"/><!-- 创建时间 -->
+        <result column="update_by" property="updateBy"/><!-- 更新者 -->
+        <result column="update_time" property="updateTime"/><!-- 更新时间 -->
+        <result column="parentMenuName" property="parentMenuName"/><!-- 更新时间 -->
+    </resultMap>
+
+    <sql id="selectDeptVo">
+        select dept_id,parent_id,ancestors,dept_name,order_num,leader,phone,email,status,del_flag,create_by,create_time,update_by,update_time from sys_dept
+    </sql>
+
+    <select id="selectDeptList" parameterType="Dept" resultMap="DeptResult">
+        <include refid="selectDeptVo"/>
+        <where>
+            <if test="deptId != null"> and dept_id = #{deptId}</if>
+            <if test="parentId != null"> and parent_id = #{parentId}</if>
+            <if test="ancestors != null and ancestors != ''"> and ancestors = #{ancestors}</if>
+            <if test="deptName != null and deptName != ''">
+                and FIND_IN_SET(dept_id,(
+                SELECT GROUP_CONCAT(DISTINCT(ancestors)) FROM sys_dept WHERE dept_name LIKE concat('%',#{deptName},'%')
+                )) OR dept_name LIKE concat('%',#{deptName},'%')
+             </if>
+            <if test="orderNum != null"> and order_num = #{orderNum}</if>
+            <if test="leader != null and leader != ''"> and leader = #{leader}</if>
+            <if test="phone != null and phone != ''"> and phone = #{phone}</if>
+            <if test="email != null and email != ''"> and email = #{email}</if>
+            <if test="status != null and status != ''"> and status = #{status}</if>
+            <if test="delFlag != null and delFlag != ''"> and del_flag = #{delFlag}</if>
+            <if test="createBy != null and createBy != ''"> and create_by = #{createBy}</if>
+            <if test="createTime != null"> and create_time = #{createTime}</if>
+            <if test="updateBy != null and updateBy != ''"> and update_by = #{updateBy}</if>
+            <if test="updateTime != null"> and update_time = #{updateTime}</if>
+             and del_flag=0
+        </where>
+    </select>
+
+    <select id="selectDeptById" parameterType="Long" resultMap="DeptExtResult">
+        select d1.dept_id,d1.parent_id,d1.ancestors,d1.dept_name,d1.order_num,d1.leader,d1.phone,
+        d1.email,d1.status,d1.del_flag,d1.create_by,d1.create_time,d1.update_by,d1.update_time,
+        d2.dept_name parentMenuName
+        FROM sys_dept d1
+        LEFT JOIN sys_dept d2
+        ON d1.parent_id = d2.dept_id
+        WHERE d1.dept_id=#{deptId}
+    </select>
+
+    <insert id="insertDept" parameterType="Dept" useGeneratedKeys="true" keyProperty="deptId" >
+        insert into sys_dept
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="parentId != null"> parent_id,</if>
+            <if test="ancestors != null and ancestors != ''"> ancestors,</if>
+            <if test="deptName != null and deptName != ''"> dept_name,</if>
+            <if test="orderNum != null"> order_num,</if>
+            <if test="leader != null and leader != ''"> leader,</if>
+            <if test="phone != null and phone != ''"> phone,</if>
+            <if test="email != null and email != ''"> email,</if>
+            <if test="status != null and status != ''"> status,</if>
+            <if test="delFlag != null and delFlag != ''"> del_flag,</if>
+            <if test="createBy != null and createBy != ''"> create_by,</if>
+            <if test="createTime != null"> create_time,</if>
+            <if test="updateBy != null and updateBy != ''"> update_by,</if>
+            <if test="updateTime != null"> update_time,</if>
+        </trim>
+
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="parentId != null"> #{parentId},</if>
+            <if test="ancestors != null and ancestors != ''"> #{ancestors},</if>
+            <if test="deptName != null and deptName != ''"> #{deptName},</if>
+            <if test="orderNum != null"> #{orderNum},</if>
+            <if test="leader != null and leader != ''"> #{leader},</if>
+            <if test="phone != null and phone != ''"> #{phone},</if>
+            <if test="email != null and email != ''"> #{email},</if>
+            <if test="status != null and status != ''"> #{status},</if>
+            <if test="delFlag != null and delFlag != ''"> #{delFlag},</if>
+            <if test="createBy != null and createBy != ''"> #{createBy},</if>
+            <if test="createTime != null"> #{createTime},</if>
+            <if test="updateBy != null and updateBy != ''"> #{updateBy},</if>
+            <if test="updateTime != null"> #{updateTime},</if>
+        </trim>
+    </insert>
+    
+    <update id="updateDept" parameterType="Dept">
+        update sys_dept
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="parentId != null ">parent_id = #{parentId},</if>
+            <if test="ancestors != null  and ancestors != ''">ancestors = #{ancestors},</if>
+            <if test="deptName != null  and deptName != ''">dept_name = #{deptName},</if>
+            <if test="orderNum != null ">order_num = #{orderNum},</if>
+            <if test="leader != null  and leader != ''">leader = #{leader},</if>
+            <if test="phone != null  and phone != ''">phone = #{phone},</if>
+            <if test="email != null  and email != ''">email = #{email},</if>
+            <if test="status != null  and status != ''">status = #{status},</if>
+            <if test="delFlag != null  and delFlag != ''">del_flag = #{delFlag},</if>
+            <if test="createBy != null  and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="updateBy != null  and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+        </trim>
+        where dept_id = #{deptId}
+    </update>
+
+    <update id="updateAncestors">
+        UPDATE sys_dept SET ancestors=REPLACE(ancestors,#{oldAncestors},#{newAncestors})
+        WHERE dept_id IN
+    (SELECT dept_id FROM (SELECT dept_id  FROM sys_dept WHERE FIND_IN_SET(#{deptId},ancestors) OR dept_id=#{deptId}) tmp)
+    </update>
+
+    <delete id="deleteDeptById" parameterType="Long">
+        delete from sys_dept where dept_id = #{deptId}
+    </delete>
+
+    <select id="findSubDept" resultType="net.wanho.po.sys.Dept">
+    SELECT dept_id  FROM sys_dept WHERE FIND_IN_SET(#{deptId},ancestors)
+</select>
+
+    <delete id="deleteDeptByIds" parameterType="String">
+        update sys_dept set del_flag=2 where dept_id in
+        <foreach item="deptId" collection="array" open="(" separator="," close=")">
+            #{deptId}
+        </foreach>
+    </delete>
+
+</mapper>

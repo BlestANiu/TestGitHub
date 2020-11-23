@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.wanho.mapper.sys.JobLogMapper">
+    <resultMap id="JobLogResult" type="JobLog" >
+        <id column="job_log_id" property="jobLogId"/><!-- 任务日志ID -->
+        <result column="job_name" property="jobName"/><!-- 任务名称 -->
+        <result column="job_group" property="jobGroup"/><!-- 任务组名 -->
+        <result column="invoke_target" property="invokeTarget"/><!-- 调用目标字符串 -->
+        <result column="job_message" property="jobMessage"/><!-- 日志信息 -->
+        <result column="status" property="status"/><!-- 执行状态（0正常 1失败） -->
+        <result column="exception_info" property="exceptionInfo"/><!-- 异常信息 -->
+        <result column="create_time" property="createTime"/><!-- 创建时间 -->
+    </resultMap>
+
+    <sql id="selectJobLogVo">
+        select job_log_id,job_name,job_group,invoke_target,job_message,status,exception_info,create_time from sys_job_log
+    </sql>
+
+    <select id="selectJobLogList" parameterType="JobLog" resultMap="JobLogResult">
+        <include refid="selectJobLogVo"/>
+        <where>
+            <if test="jobLogId != null"> and job_log_id = #{jobLogId}</if>
+            <if test="jobName != null and jobName != ''"> and job_name = #{jobName}</if>
+            <if test="jobGroup != null and jobGroup != ''"> and job_group = #{jobGroup}</if>
+            <if test="invokeTarget != null and invokeTarget != ''"> and invoke_target = #{invokeTarget}</if>
+            <if test="jobMessage != null and jobMessage != ''"> and job_message = #{jobMessage}</if>
+            <if test="status != null and status != ''"> and status = #{status}</if>
+            <if test="exceptionInfo != null and exceptionInfo != ''"> and exception_info = #{exceptionInfo}</if>
+            <if test="createTime != null"> and create_time = #{createTime}</if>
+        </where>
+    </select>
+
+    <select id="selectJobLogById" parameterType="Long" resultMap="JobLogResult">
+        <include refid="selectJobLogVo"/>
+        where job_log_id = #{jobLogId}
+    </select>
+
+    <insert id="insertJobLog" parameterType="JobLog" useGeneratedKeys="true" keyProperty="jobLogId" >
+        insert into sys_job_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="jobName != null and jobName != ''"> job_name,</if>
+            <if test="jobGroup != null and jobGroup != ''"> job_group,</if>
+            <if test="invokeTarget != null and invokeTarget != ''"> invoke_target,</if>
+            <if test="jobMessage != null and jobMessage != ''"> job_message,</if>
+            <if test="status != null and status != ''"> status,</if>
+            <if test="exceptionInfo != null and exceptionInfo != ''"> exception_info,</if>
+            <if test="createTime != null"> create_time,</if>
+        </trim>
+
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="jobName != null and jobName != ''"> #{jobName},</if>
+            <if test="jobGroup != null and jobGroup != ''"> #{jobGroup},</if>
+            <if test="invokeTarget != null and invokeTarget != ''"> #{invokeTarget},</if>
+            <if test="jobMessage != null and jobMessage != ''"> #{jobMessage},</if>
+            <if test="status != null and status != ''"> #{status},</if>
+            <if test="exceptionInfo != null and exceptionInfo != ''"> #{exceptionInfo},</if>
+            <if test="createTime != null"> #{createTime},</if>
+        </trim>
+    </insert>
+    
+    <update id="updateJobLog" parameterType="JobLog">
+        update sys_job_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="jobName != null  and jobName != ''">job_name = #{jobName},</if>
+            <if test="jobGroup != null  and jobGroup != ''">job_group = #{jobGroup},</if>
+            <if test="invokeTarget != null  and invokeTarget != ''">invoke_target = #{invokeTarget},</if>
+            <if test="jobMessage != null  and jobMessage != ''">job_message = #{jobMessage},</if>
+            <if test="status != null  and status != ''">status = #{status},</if>
+            <if test="exceptionInfo != null  and exceptionInfo != ''">exception_info = #{exceptionInfo},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where job_log_id = #{jobLogId}
+    </update>
+
+    <delete id="deleteJobLogById" parameterType="Long">
+        delete from sys_job_log where job_log_id = #{jobLogId}
+    </delete>
+    
+    <delete id="deleteJobLogByIds" parameterType="String">
+        delete from sys_job_log where job_log_id in
+        <foreach item="jobLogId" collection="array" open="(" separator="," close=")">
+            #{jobLogId}
+        </foreach>
+    </delete>
+
+</mapper>

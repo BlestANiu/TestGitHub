@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.wanho.mapper.sys.JobMapper">
+    <resultMap id="JobResult" type="Job" >
+        <id column="job_id" property="jobId"/><!-- 任务ID -->
+        <id column="job_name" property="jobName"/><!-- 任务名称 -->
+        <id column="job_group" property="jobGroup"/><!-- 任务组名 -->
+        <result column="invoke_target" property="invokeTarget"/><!-- 调用目标字符串 -->
+        <result column="cron_expression" property="cronExpression"/><!-- cron执行表达式 -->
+        <result column="misfire_policy" property="misfirePolicy"/><!-- 计划执行错误策略（1立即执行 2执行一次 3放弃执行） -->
+        <result column="concurrent" property="concurrent"/><!-- 是否并发执行（0允许 1禁止） -->
+        <result column="status" property="status"/><!-- 状态（0正常 1暂停） -->
+        <result column="create_by" property="createBy"/><!-- 创建者 -->
+        <result column="create_time" property="createTime"/><!-- 创建时间 -->
+        <result column="update_by" property="updateBy"/><!-- 更新者 -->
+        <result column="update_time" property="updateTime"/><!-- 更新时间 -->
+        <result column="remark" property="remark"/><!-- 备注信息 -->
+    </resultMap>
+
+    <sql id="selectJobVo">
+        select job_id,job_name,job_group,invoke_target,cron_expression,misfire_policy,concurrent,status,create_by,create_time,update_by,update_time,remark from sys_job
+    </sql>
+
+    <select id="selectJobList" parameterType="Job" resultMap="JobResult">
+        <include refid="selectJobVo"/>
+        <where>
+            <if test="jobId != null"> and job_id = #{jobId}</if>
+            <if test="jobName != null and jobName != ''"> and job_name = #{jobName}</if>
+            <if test="jobGroup != null and jobGroup != ''"> and job_group = #{jobGroup}</if>
+            <if test="invokeTarget != null and invokeTarget != ''"> and invoke_target = #{invokeTarget}</if>
+            <if test="cronExpression != null and cronExpression != ''"> and cron_expression = #{cronExpression}</if>
+            <if test="misfirePolicy != null and misfirePolicy != ''"> and misfire_policy = #{misfirePolicy}</if>
+            <if test="concurrent != null and concurrent != ''"> and concurrent = #{concurrent}</if>
+            <if test="status != null and status != ''"> and status = #{status}</if>
+            <if test="createBy != null and createBy != ''"> and create_by = #{createBy}</if>
+            <if test="createTime != null"> and create_time = #{createTime}</if>
+            <if test="updateBy != null and updateBy != ''"> and update_by = #{updateBy}</if>
+            <if test="updateTime != null"> and update_time = #{updateTime}</if>
+            <if test="remark != null and remark != ''"> and remark = #{remark}</if>
+        </where>
+    </select>
+
+    <select id="selectJobById" parameterType="Long" resultMap="JobResult">
+        <include refid="selectJobVo"/>
+        where job_id = #{jobId}
+    </select>
+
+    <insert id="insertJob" parameterType="Job" useGeneratedKeys="true" keyProperty="jobId" >
+        insert into sys_job
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="jobName != null and jobName != ''"> job_name,</if>
+            <if test="jobGroup != null and jobGroup != ''"> job_group,</if>
+            <if test="invokeTarget != null and invokeTarget != ''"> invoke_target,</if>
+            <if test="cronExpression != null and cronExpression != ''"> cron_expression,</if>
+            <if test="misfirePolicy != null and misfirePolicy != ''"> misfire_policy,</if>
+            <if test="concurrent != null and concurrent != ''"> concurrent,</if>
+            <if test="status != null and status != ''"> status,</if>
+            <if test="createBy != null and createBy != ''"> create_by,</if>
+            <if test="createTime != null"> create_time,</if>
+            <if test="updateBy != null and updateBy != ''"> update_by,</if>
+            <if test="updateTime != null"> update_time,</if>
+            <if test="remark != null and remark != ''"> remark,</if>
+        </trim>
+
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="jobName != null and jobName != ''"> #{jobName},</if>
+            <if test="jobGroup != null and jobGroup != ''"> #{jobGroup},</if>
+            <if test="invokeTarget != null and invokeTarget != ''"> #{invokeTarget},</if>
+            <if test="cronExpression != null and cronExpression != ''"> #{cronExpression},</if>
+            <if test="misfirePolicy != null and misfirePolicy != ''"> #{misfirePolicy},</if>
+            <if test="concurrent != null and concurrent != ''"> #{concurrent},</if>
+            <if test="status != null and status != ''"> #{status},</if>
+            <if test="createBy != null and createBy != ''"> #{createBy},</if>
+            <if test="createTime != null"> #{createTime},</if>
+            <if test="updateBy != null and updateBy != ''"> #{updateBy},</if>
+            <if test="updateTime != null"> #{updateTime},</if>
+            <if test="remark != null and remark != ''"> #{remark},</if>
+        </trim>
+    </insert>
+    
+    <update id="updateJob" parameterType="Job">
+        update sys_job
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="jobName != null  and jobName != ''">job_name = #{jobName},</if>
+            <if test="jobGroup != null  and jobGroup != ''">job_group = #{jobGroup},</if>
+            <if test="invokeTarget != null  and invokeTarget != ''">invoke_target = #{invokeTarget},</if>
+            <if test="cronExpression != null  and cronExpression != ''">cron_expression = #{cronExpression},</if>
+            <if test="misfirePolicy != null  and misfirePolicy != ''">misfire_policy = #{misfirePolicy},</if>
+            <if test="concurrent != null  and concurrent != ''">concurrent = #{concurrent},</if>
+            <if test="status != null  and status != ''">status = #{status},</if>
+            <if test="createBy != null  and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="updateBy != null  and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="remark != null  and remark != ''">remark = #{remark},</if>
+        </trim>
+        where job_id = #{jobId}
+    </update>
+
+    <delete id="deleteJobById" parameterType="Long">
+        delete from sys_job where job_id = #{jobId}
+    </delete>
+    
+    <delete id="deleteJobByIds" parameterType="String">
+        delete from sys_job where job_id in
+        <foreach item="jobId" collection="array" open="(" separator="," close=")">
+            #{jobId}
+        </foreach>
+    </delete>
+
+</mapper>
